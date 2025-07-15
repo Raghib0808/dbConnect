@@ -9,7 +9,7 @@ const app = express();
 const PORT = 8080;
 
 // setting up cors
-// checking for contributions
+// checking for contributions (failed)
 // adding the .gitignore file to ignore node_modules and .env files
 app.use(express.json());
 
