@@ -11,6 +11,7 @@ const PORT = 8080;
 // setting up cors
 // adding the .gitignore file to ignore node_modules and .env files
 app.use(express.json());
+
 app.use(express.urlencoded({extended:true}))
 
 
