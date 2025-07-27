@@ -2,8 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import db from './utils/db.js';
-import User from './model/user.model.js';
-import { registerUser } from './controllers/user.controller.js';
+import UserRoutes from './routes/user.routes.js';
 dotenv.config();
 
 
@@ -12,18 +11,22 @@ const PORT = process.env.PORT||3000;
 // setting up cors
 // checking for contributions (failed)
 // adding the .gitignore file to ignore node_modules and .env files
+
+
+app.use(
+  cors({
+    origin: process.env.BASE_URL,
+    credentials: true,
+    methods: ["GET", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(express.urlencoded({extended:true}))
 
-
-app.use(cors({
-  origin:['http://127.0.0.1:5500',process.env.BASE_URL],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}))
-
-app.get('/', (req, res) => {  
+app.get('/', (req, res)   => {  
   res.send(`Hello, World! You requested: ${JSON.stringify(req.headers)}`);
 });
 
@@ -42,4 +45,5 @@ db()
   });
 
 // importing user routes and imported after db connection
-app.use('/api/v1/user', registerUser);
+// ⭐here as you can see we used user/ and in registerUser we used /register but after appending it resulted in /user/register because express consider it that way but in fastapi in python consider it //
+app.use('/api/v1/user/', UserRoutes);
