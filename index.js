@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import db from './utils/db.js';
 import UserRoutes from './routes/user.routes.js';
+import cookieParser from 'cookie-parser';
 dotenv.config();
 
 
@@ -13,6 +14,7 @@ const PORT = process.env.PORT||3000;
 // adding the .gitignore file to ignore node_modules and .env files
 
 
+// express middlewares 
 app.use(
   cors({
     origin: process.env.BASE_URL,
@@ -21,7 +23,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import User from '../model/user.model.js';
 import nodemailer from 'nodemailer';
+import jwt from 'jsonwebtoken';
+
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body || {};
@@ -103,4 +105,60 @@ const verifyUser = async (req, res) => {
 
 }
 
-export { registerUser, verifyUser };
+const loginUser = async (req,res)=>{
+    const {email, password} = req.body;
+    if(!email || !password){
+      return res.status(400).json({
+        message: "Email and password are required"
+      })
+    }
+
+    try{
+        const user = User.findOne({email});
+        if(!user){
+          return res.status(400).json({
+            message: "User not found"
+          })
+        }
+        
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(!isMatch){
+          return res.status(400).json({
+            message:'Passowrd not matched'
+          })
+        }
+
+        const token = jwt.sign({id:user._id,role:user.role},process.env.JWT_SECRET ,{
+          expiresIn: '24h'
+        })
+
+      //  🍪🍪🍪🍪 utilizing cookies to store the token
+      const cookieOptions ={
+        httpOnly: true,
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      }
+      res.cookie('token', token, cookieOptions);
+
+      res.status(200).json({
+        message: "User logged in successfully",
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          isVerified: user.isVerified
+        },
+        token: token
+      })
+
+    }
+    catch(err){
+        return res.status(500).json({
+          message: "Internal Server Error",
+          error: err.message
+        });
+    }
+}
+
+export { registerUser, verifyUser,loginUser };
