@@ -2,7 +2,8 @@ import crypto from 'crypto';
 import User from '../model/user.model.js';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
-
+import bcrypt from 'bcryptjs';
+import { match } from 'assert';
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body || {};
@@ -107,6 +108,8 @@ const verifyUser = async (req, res) => {
 
 const loginUser = async (req,res)=>{
     const {email, password} = req.body;
+    // console.log(email, password);
+    
     if(!email || !password){
       return res.status(400).json({
         message: "Email and password are required"
@@ -114,12 +117,13 @@ const loginUser = async (req,res)=>{
     }
 
     try{
-        const user = User.findOne({email});
+        const user =await User.findOne({email});
         if(!user){
           return res.status(400).json({
             message: "User not found"
           })
         }
+        console.log(password, user.email,user._id);
         
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch){
@@ -149,7 +153,6 @@ const loginUser = async (req,res)=>{
           role: user.role,
           isVerified: user.isVerified
         },
-        token: token
       })
 
     }
@@ -161,4 +164,54 @@ const loginUser = async (req,res)=>{
     }
 }
 
-export { registerUser, verifyUser,loginUser };
+
+const getMe = async (req,res)=>{
+    const data = req.user;
+    // console.log(data);
+    
+      try{
+          const user = await User.findById('688a635dd7d2bb7b7815480f').select("-password");
+          if(!user){
+            return res.status(404).json({
+              message: "User not found"
+            });
+          }
+
+          res.status(200).json({
+            message: " User create successfully",
+            user: user
+          })
+      }
+      catch(err){
+        return res.status(500).json({
+          message: "Internal Server Error",
+          error: err.message
+        });
+      }
+}
+
+const logOutUser = async (req,res)=>{
+      try{
+            res.cookie('token','',{});
+            res.status(200).json({
+              message: "User logged out successfully",
+              success: true
+            });
+      }
+      catch(err){
+        return res.status(500).json({
+          message: "Internal Server Error",
+          error: err.message
+        });
+      }
+}
+
+const forgotPassword = async (req,res)=>{
+  
+}
+const resetPassword = async (req,res)=>{
+  
+}
+
+
+export { registerUser, verifyUser,loginUser,logOutUser, getMe, forgotPassword, resetPassword };

@@ -49,3 +49,4 @@ db()
 // importing user routes and imported after db connection
 // ⭐here as you can see we used user/ and in registerUser we used /register but after appending it resulted in /user/register because express consider it that way but in fastapi in python consider it //
 app.use('/api/v1/user/', UserRoutes);
+

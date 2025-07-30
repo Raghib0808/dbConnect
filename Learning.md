@@ -12,4 +12,6 @@
 
 }
 
-3)=> 
+3)=> useschems.post can be used to send push notifications
+
+4)=> cors is a browser feature and a http feature that why we can access apis from postman without getting a cors eror
